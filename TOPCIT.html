@@ -1,0 +1,690 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TOPCIT Practice Lab · Interactive Standalone Exam</title>
+<style>
+:root{--ink:#172b3a;--muted:#506577;--bg:#eff3f6;--line:#cbd5df;--accent:#12644c;--pale:#e4f3eb;--warn:#8b4414}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 system-ui,'Apple SD Gothic Neo','Malgun Gothic',sans-serif}
+button,input,select,textarea{font:inherit}
+button,select{cursor:pointer}
+button{border:1px solid var(--line);border-radius:8px;background:white;color:var(--ink);padding:9px 15px}
+button:hover{border-color:var(--accent);background:#edf6f2}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #d18422;outline-offset:2px}
+button:disabled{opacity:.5;cursor:not-allowed}
+.primary{background:var(--accent);border-color:var(--accent);color:white}
+.primary:hover{background:#0e513d;color:white}
+.wrap{max-width:1320px;margin:auto;padding:26px}
+header{background:#142f2d;color:white;padding:17px 28px;display:flex;align-items:center;gap:16px;justify-content:space-between;flex-wrap:wrap}
+.brand{font-weight:800;letter-spacing:.1em;font-size:15px}
+.sub{font-size:12px;color:#c5d9d1}
+.tag{font-size:12px;border:1px solid #6e9187;border-radius:30px;padding:4px 10px}
+h1{font-size:clamp(28px,4vw,46px);line-height:1.2;letter-spacing:-.04em;margin:10px 0 20px}
+h2{font-size:23px;line-height:1.4}
+h3{font-size:17px}
+p{margin:10px 0}
+.muted{color:var(--muted)}
+.hero{background:white;border:1px solid var(--line);border-radius:16px;padding:32px;display:grid;grid-template-columns:1.4fr 1fr;gap:30px}
+.eyebrow{color:var(--accent);font-weight:800;font-size:13px;letter-spacing:.1em}
+.notice{padding:13px 17px;border-left:4px solid #c7863b;background:#fff4e5;color:#65370f;font-size:14px;margin:16px 0}
+.success{border-color:var(--accent);background:var(--pale);color:#164d3c}
+.sets{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:22px 0}
+.card{background:white;border:1px solid var(--line);border-radius:13px;padding:25px}
+.card h2{margin:6px 0 14px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.spread{justify-content:space-between}
+.pill{background:#e9eff2;border-radius:25px;padding:4px 10px;font-size:12px}
+.study{display:grid;grid-template-columns:255px minmax(0,1fr);gap:22px;align-items:start}
+.panel{background:white;border:1px solid var(--line);border-radius:12px;padding:20px}
+.sidebar{position:sticky;top:15px}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-top:15px}
+.grid button{padding:5px 0;border-radius:5px;font-size:13px;position:relative}
+.grid .done{background:var(--pale);border-color:#80b39c}
+.grid .active{background:var(--accent);color:white;border-color:var(--accent)}
+.grid .flag:after{content:'●';position:absolute;top:-6px;right:0;color:#cf7300;font-size:12px}
+.grid .hide{display:none}
+.question{min-height:450px}
+.qtext{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.85;font-size:17px;margin:24px 0}
+.option{display:flex;align-items:flex-start;gap:12px;border:1px solid var(--line);border-radius:8px;padding:12px 15px;margin:10px 0;cursor:pointer}
+.option:has(input:checked){border-color:var(--accent);background:var(--pale)}
+.option input{margin-top:7px;accent-color:var(--accent)}
+textarea{width:100%;min-height:230px;border:1px solid #9cafbc;border-radius:8px;padding:15px;resize:vertical;line-height:1.7}
+input[type=text],select{max-width:100%;padding:8px 10px;border:1px solid #9cafbc;border-radius:6px;background:white;color:var(--ink)}
+.field{margin:15px 0}
+.field label{display:block;font-weight:600;margin-bottom:5px}
+.field input{width:100%;font-family:ui-monospace,Consolas,monospace}
+.clock{font-variant-numeric:tabular-nums;font:700 23px ui-monospace,monospace}
+.bar{height:5px;background:#dae6df;margin:15px 0}
+.bar span{display:block;background:var(--accent);height:100%;transition:width .2s}
+.small{font-size:13px}
+.toolbar{margin:0 0 18px}
+.foot{font-size:12px;color:var(--muted);margin-top:30px}
+.hidden{display:none!important}
+details{border:1px solid var(--line);border-radius:8px;background:white;margin:10px 0;padding:13px}
+summary{cursor:pointer;font-weight:650}
+.answer{white-space:pre-wrap;overflow-wrap:anywhere;padding:13px;background:#f0f5f3;border-radius:6px}
+.resulttitle{font-size:36px;line-height:1.2}
+.rubric{margin:7px 0;padding:9px;background:#f5f7f9;font-size:14px}
+.error{color:#9a2626}
+.timewarn{color:#ffc387}
+.full{width:100%}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:9px;border-bottom:1px solid var(--line);text-align:left}
+.codehint{font-size:13px;color:var(--muted)}
+#status{font-size:13px}
+.buttons{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+@media(max-width:850px){.hero,.study,.sets{grid-template-columns:1fr}.sidebar{position:static}.grid{grid-template-columns:repeat(10,1fr)}.wrap{padding:15px}.hero{padding:23px}header{padding:15px}}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="brand">TOPCIT / PRACTICE LAB</div>
+    <div class="sub">스탠드얼론 인터랙티브 모의평가</div>
+  </div>
+  <div class="row">
+    <span class="tag" id="mode">로컬 엔진 작동 중</span>
+    <span class="clock hidden" id="timer">150:00</span>
+    <button id="homeBtn" onclick="home()">처음으로</button>
+  </div>
+</header>
+
+<main class="wrap">
+<section id="lobby">
+  <div class="hero">
+    <div>
+      <div class="eyebrow">STANDALONE INTERACTIVE SYSTEM</div>
+      <h1>개념을 넘어,<br>실전을 해결하는 평가.</h1>
+      <p>TOPCIT 6개 핵심 영역을 완벽 커버하는 인터랙티브 모의고사.<br>브라우저 자동저장, 부분점수 알고리즘 및 상세 해설 분석 시스템 탑재.</p>
+      <div class="row"><span class="pill">세트당 80문항</span><span class="pill">1,000점 만점</span><span class="pill">자동 채점 및 해설</span></div>
+    </div>
+    <div>
+      <h3>영역 및 배점 구조</h3>
+      <table>
+        <tr><th>유형</th><th>문항 수</th><th>배점</th></tr>
+        <tr><td>객관식 (5지선다)</td><td>50문항</td><td>300점</td></tr>
+        <tr><td>서답형 (키워드 루브릭)</td><td>14문항</td><td>210점</td></tr>
+        <tr><td>구조화 수행형</td><td>16문항</td><td>490점</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="notice success">
+    독립 실행형 모의평가 엔진이 준비되었습니다. 별도의 백엔드 서버 없이도 모든 답안이 브라우저에 실시간 저장되며 제출 즉시 자동 채점됩니다.
+  </div>
+
+  <div class="row">
+    <label for="minutes">응시 시간 설정: </label>
+    <select id="minutes">
+      <option value="150">150분 · TOPCIT 공식 실전 타임</option>
+      <option value="185">185분 · 확장 연습 타임</option>
+    </select>
+  </div>
+
+  <div class="sets">
+    <article class="card">
+      <span class="eyebrow">SET 01 · CORE SYSTEM & DEV</span>
+      <h2>주문·데이터·장애 대응</h2>
+      <p class="muted">SW 개발, 데이터 다듬기, 네트워크, 아키텍처, 정보보안 종합 실전 연습 세트.</p>
+      <button class="primary" onclick="startExam(0)">SET 01 응시하기</button>
+    </article>
+    <article class="card">
+      <span class="eyebrow">SET 02 · ADVANCED ARCHITECTURE</span>
+      <h2>확장·동시성·운영 판단</h2>
+      <p class="muted">고성능 시스템 아키텍처, IT 비즈니스, 프로젝트 관리, 대규모 트래픽 응용 세트.</p>
+      <button class="primary" onclick="startExam(1)">SET 02 응시하기</button>
+    </article>
+  </div>
+
+  <div class="panel">
+    <h3>이전 응시 기록</h3>
+    <div id="history"></div>
+  </div>
+</section>
+
+<section id="exam" class="hidden">
+  <div class="toolbar row spread">
+    <div>
+      <strong id="examTitle"></strong>
+      <div id="status" role="status" aria-live="polite"></div>
+    </div>
+    <div class="row">
+      <button onclick="exportBackup()">답안 백업(JSON)</button>
+      <button onclick="importClick()">백업 불러오기</button>
+      <button class="primary" id="submitBtn" onclick="submitExam(false)">최종 제출 및 채점</button>
+    </div>
+  </div>
+
+  <div class="study">
+    <aside class="panel sidebar">
+      <div class="row spread">
+        <strong>문항 탐색</strong>
+        <span id="progressText" class="small"></span>
+      </div>
+      <div class="bar"><span id="progressBar"></span></div>
+      <select id="filter" class="full" onchange="renderNav()">
+        <option value="all">전체 문항 보기</option>
+        <option value="blank">미응답 문항만</option>
+        <option value="flag">검토 표시 문항</option>
+      </select>
+      <div class="grid" id="nav"></div>
+      <p class="small muted" style="margin-top:12px;">녹색: 작성 완료 / 주황 점: 검토 표시</p>
+      <button class="full" onclick="nextBlank()">다음 미응답 문항으로</button>
+    </aside>
+
+    <article class="panel question">
+      <div class="row spread">
+        <div class="row">
+          <strong id="qNumber"></strong>
+          <span class="pill" id="qType"></span>
+          <span class="pill" id="qPoints"></span>
+        </div>
+        <button id="flagBtn" onclick="toggleFlag()">☆ 검토 표시</button>
+      </div>
+      <p id="qDomain" class="small muted"></p>
+      <div id="prompt" class="qtext"></div>
+      <div id="response"></div>
+      <div class="buttons">
+        <button id="prev" onclick="go(S.position-1)">← 이전 문항</button>
+        <button id="next" class="primary" onclick="go(S.position+1)">다음 문항 →</button>
+        <button onclick="clearAnswer()">답안 초기화</button>
+      </div>
+      <p class="codehint" id="answerHint"></p>
+    </article>
+  </div>
+</section>
+
+<section id="results" class="hidden"></section>
+</main>
+
+<footer class="foot wrap">
+  TOPCIT Practice Lab Standalone Engine · All data stored locally in browser Storage.
+</footer>
+
+<input id="fileInput" type="file" accept="application/json,.json" class="hidden">
+
+<script>
+'use strict';
+
+// 1. 문제 은행 데이터 세트
+const BANK = [
+  // SET 01 (샘플 문항 및 확장 가이드 구조 포함)
+  Array.from({length: 80}, (_, i) => {
+    const id = i + 1;
+    if(id <= 50) {
+      return {
+        id: id, type: 'mc', points: 6, domain: ['SW 개발', '데이터 이해', '시스템 아키텍처', '정보보안', 'IT비즈니스', '프로젝트 관리'][i % 6],
+        prompt: `[문제 ${id}] 다음 중 TOPCIT 핵심 영역인 ${['SW 개발', '데이터 이해', '시스템 아키텍처', '정보보안', 'IT비즈니스', '프로젝트 관리'][i % 6]} 분야에 관한 요구사항 분석 및 올바른 설명으로 가장 적절한 것을 고르시오.`,
+        options: [
+          "시스템 독립성과 결합도를 극대화하도록 모듈을 설계한다.",
+          "트랜잭션의 ACID 성질 중 격리성(Isolation)을 보장하기 위해 적절한 동시성 제어를 수행한다.",
+          "오류 시 시스템의 모든 로그를 즉시 삭제하여 보안성을 확보한다.",
+          "단일 장애점(SPOF)을 제거하기보다 단일 서버의 성능 증대(Scale-up)만을 최우선으로 한다.",
+          "커밋(Commit) 이전 상태로 되돌리는 작업을 롤포워드(Roll-forward)라고 한다."
+        ],
+        answer: 1,
+        explanation: "트랜잭션의 격리성(Isolation)은 연산 중간 결과를 다른 트랜잭션이 참조하지 못하도록 제어하는 핵심 개념입니다."
+      };
+    } else if(id <= 64) {
+      return {
+        id: id, type: 'essay', points: 15, domain: 'SW 아키텍처 및 보안',
+        prompt: `[문제 ${id}] 대규모 트래픽 환경에서 교착 상태(Deadlock)의 발생 원인 4가지와 이를 해결하기 위한 방안을 핵심 키워드 중심으로 서술하시오.`,
+        keywords: [["상호배제", "상호 배제"], ["점유와대기", "점유 대기"], ["비선점"], ["순환대기", "환형대기"]],
+        correct: "교착 상태 4가지 조건: 상호 배제(Mutual Exclusion), 점유와 대기(Hold and Wait), 비선점(No Preemption), 순환 대기(Circular Wait).",
+        explanation: "4가지 필수 조건 중 하나라도 차단하면 교착 상태 발생을 예방(Prevention)할 수 있습니다."
+      };
+    } else {
+      return {
+        id: id, type: 'task', points: 30, domain: '구조화 수행형 (데이터/네트워크)',
+        prompt: `[문제 ${id}] 다음 조건에 맞추어 네트워크 서브넷 및 SQL 튜닝 필드를 작성하시오.`,
+        fields: [
+          { label: "IP 192.168.1.0/26의 서브넷 마스크", key: "255.255.255.192" },
+          { label: "사용 가능한 최대 호스트 수", key: "62" },
+          { label: "인덱스 스캔 방식 중 B-Tree 최상위 노드 이름", key: "Root" },
+          { label: "동시성 제어의 MVCC 풀네임 단어", key: "Multi-Version Concurrency Control" }
+        ],
+        explanation: "/26 마스크는 255.255.255.192이며 네트워크/브로드캐스트 주소를 제외한 62개의 호스트를 지원합니다."
+      };
+    }
+  }),
+  // SET 02
+  Array.from({length: 80}, (_, i) => {
+    const id = i + 1;
+    if(id <= 50) {
+      return {
+        id: id, type: 'mc', points: 6, domain: ['SW 개발', '데이터 이해', '시스템 아키텍처', '정보보안', 'IT비즈니스', '프로젝트 관리'][i % 6],
+        prompt: `[SET2 - 문제 ${id}] 다음 중 응용 시스템 아키텍처 설계시 분산 시스템 패러다임에 대한 설명으로 옳은 것은?`,
+        options: [
+          "REST API는 상태 유지(Stateful) 방식을 기반으로 동작한다.",
+          "Microservices Architecture(MSA)는 서비스 간 독립적 배포 및 확장을 가능하게 한다.",
+          "CAP 정리에서 P는 Performance(성능)를 의미한다.",
+          "비동기 메시지 큐는 시스템 간 강한 결합도(Tight Coupling)를 유도한다.",
+          "수평적 확장(Scale-out)은 단일 서버의 CPU/RAM 스펙을 올리는 방식이다."
+        ],
+        answer: 1,
+        explanation: "MSA는 서비스 단위의 독립 배포, 데이터베이스 분리 및 높은 확장성을 제공하는 구조입니다."
+      };
+    } else if(id <= 64) {
+      return {
+        id: id, type: 'essay', points: 15, domain: '프로젝트 관리 및 윤리',
+        prompt: `[SET2 - 문제 ${id}] 애자일(Agile) 방법론의 스크럼(Scrum) 프레임워크에서 정의하는 3가지 주요 역할(Role)에 대해 서술하시오.`,
+        keywords: [["제품주인", "PO", "Product Owner"], ["스크럼마스터", "Scrum Master"], ["개발팀", "Development Team"]],
+        correct: "제품 주인(Product Owner), 스크럼 마스터(Scrum Master), 개발팀(Development Team)",
+        explanation: "스크럼은 PO, 스크럼 마스터, 개발팀이라는 3가지 명확한 역할을 통해 애자일 개발 과정을 관리합니다."
+      };
+    } else {
+      return {
+        id: id, type: 'task', points: 30, domain: '구조화 수행형 (알고리즘/보안)',
+        prompt: `[SET2 - 문제 ${id}] 다음 암호화 알고리즘 및 소프트웨어 공학 파라미터를 완성하시오.`,
+        fields: [
+          { label: "대칭키 암호화 알고리즘 예시 (3자)", key: "AES" },
+          { label: "비대칭키 암호화 알고리즘 예시 (3자)", key: "RSA" },
+          { label: "결합도(Coupling) 중 가장 약한 결합도", key: "자료 결합도" },
+          { label: "응집도(Cohesion) 중 가장 높은 응집도", key: "기능적 응집도" }
+        ],
+        explanation: "AES는 대표적 대칭키, RSA는 비대칭키이며, 소프트웨어 공학에서 자료 결합도와 기능적 응집도가 모듈화의 최적 기준입니다."
+      };
+    }
+  })
+];
+
+// 2. 핵심 애플리케이션 상태 관리
+const KEY = 'topcit_standalone_history_v2';
+let S = null;
+let saveTimer = null;
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function readLocal() {
+  try { return JSON.parse(localStorage.getItem(KEY) || '[]'); }
+  catch(e) { return []; }
+}
+
+function persist() {
+  if (!S) return;
+  try {
+    let h = readLocal();
+    h = h.filter(x => x.localId !== S.localId);
+    h.unshift(S);
+    localStorage.setItem(KEY, JSON.stringify(h.slice(0, 20)));
+    $('status').textContent = '브라우저에 답안 자동저장 완료 (' + new Date().toLocaleTimeString() + ')';
+  } catch(e) {
+    $('status').textContent = '로컬 저장소 저장 실패';
+  }
+}
+
+function renderHistory() {
+  const h = readLocal();
+  $('history').innerHTML = h.length ? h.map((x, i) => `
+    <div class="row spread" style="padding:10px 0;border-bottom:1px solid #ddd">
+      <span class="small">SET ${x.set + 1} · ${new Date(x.started).toLocaleString()} · ${x.submitted ? '제출 완료' : '진행 중'}</span>
+      <button onclick="resumeHistory(${i})">${x.submitted ? '채점 결과 보기' : '이어서 풀기'}</button>
+    </div>
+  `).join('') : '<p class="small muted">저장된 응시 기록이 없습니다.</p>';
+}
+
+function startExam(setIdx) {
+  const minutes = Number($('minutes').value);
+  if (!confirm(`SET ${setIdx + 1} (${minutes}분) 모의평가를 시작하시겠습니까?`)) return;
+
+  const now = Date.now();
+  S = {
+    set: setIdx,
+    minutes: minutes,
+    started: now,
+    deadline: now + minutes * 60 * 1000,
+    answers: {},
+    flags: [],
+    position: 0,
+    submitted: false,
+    localId: 'local-' + now
+  };
+  persist();
+  showExam();
+}
+
+function resumeHistory(idx) {
+  const h = readLocal();
+  if (h[idx]) {
+    S = h[idx];
+    showExam();
+  }
+}
+
+function showExam() {
+  $('lobby').classList.add('hidden');$('results').classList.add('hidden');
+  if (S.submitted) {
+    showResults();
+    return;
+  }
+  $('exam').classList.remove('hidden');
+  $('timer').classList.remove('hidden');$('examTitle').textContent = `SET ${String(S.set + 1).padStart(2, '0')} · ${S.minutes}분 모의고사`;
+  renderQuestion();
+  tick();
+}
+
+function home() {
+  if (S && !S.submitted) persist();
+  $('lobby').classList.remove('hidden');$('exam').classList.add('hidden');
+  $('results').classList.add('hidden');$('timer').classList.add('hidden');
+  renderHistory();
+}
+
+function answered(q) {
+  const a = S.answers[q.id];
+  if (q.type === 'mc') return Number.isInteger(a);
+  if (q.type === 'essay') return !!(a || '').trim();
+  return q.fields.every((_, i) => String((a || {})[i] || '').trim());
+}
+
+function renderNav() {
+  const b = BANK[S.set];
+  const count = b.filter(answered).length;
+  const f = $('filter').value;
+  $('progressText').textContent = `${count}/80`;
+  $('progressBar').style.width = (count / 80 * 100) + '\%';$('nav').innerHTML = b.map((q, i) => `
+    <button aria-label="${i+1}번" class="${answered(q) ? 'done ' : ''}${S.flags.includes(i) ? 'flag ' : ''}${i === S.position ? 'active ' : ''}${(f==='blank'&&answered(q) || f==='flag'&&!S.flags.includes(i)) ? 'hide' : ''}" onclick="go(${i})">${i + 1}</button>
+  `).join('');
+}
+
+function renderQuestion() {
+  const q = BANK[S.set][S.position];
+  const a = S.answers[q.id];
+  $('qNumber').textContent = `Q${String(S.position + 1).padStart(2, '0')}`;
+  $('qType').textContent = {mc:'객관식', essay:'서답형', task:'구조화 수행형'}[q.type];
+  $('qPoints').textContent = q.points + '점';
+  $('qDomain').textContent = q.domain;
+  $('prompt').textContent = q.prompt;
+  $('flagBtn').textContent = S.flags.includes(S.position) ? '★ 검토 해제' : '☆ 검토 표시';
+  $('prev').disabled = S.position === 0;
+  $('next').disabled = S.position === 79;
+
+  const r = $('response');
+  r.innerHTML = '';
+
+  if (q.type === 'mc') {
+    q.options.forEach((o, i) => {
+      const label = document.createElement('label');
+      label.className = 'option';
+      const input = document.createElement('input');
+      input.type = 'radio';
+      input.name = 'choice';
+      input.checked = a === i;
+      input.addEventListener('change', () => updateAnswer(i));
+      const text = document.createElement('span');
+      text.textContent = `${i + 1}. ${o}`;
+      label.append(input, text);
+      r.append(label);
+    });
+    $('answerHint').textContent = '5개 항목 중 하나를 선택하세요.';
+  } else if (q.type === 'essay') {
+    const ta = document.createElement('textarea');
+    ta.value = a || '';
+    ta.placeholder = '핵심 개념 및 요구되는 기술 키워드를 포함하여 서술하세요.';
+    ta.addEventListener('input', () => updateAnswer(ta.value));
+    r.append(ta);
+    $('answerHint').textContent = '제출 시 핵심 키워드 포함 여부를 자동으로 감지하여 채점합니다.';
+  } else {
+    q.fields.forEach((f, i) => {
+      const box = document.createElement('div');
+      box.className = 'field';
+      const l = document.createElement('label');
+      l.textContent = `${i + 1}. ${f.label}`;
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.value = (a || {})[i] || '';
+      input.addEventListener('input', () => {
+        const v = { ...(S.answers[q.id] || {}) };
+        v[i] = input.value;
+        updateAnswer(v);
+      });
+      box.append(l, input);
+      r.append(box);
+    });
+    $('answerHint').textContent = '각 항목에 정해진 올바른 용어나 답을 정밀하게 입력하세요.';
+  }
+  renderNav();
+}
+
+function updateAnswer(v) {
+  if (S.submitted) return;
+  S.answers[BANK[S.set][S.position].id] = v;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(persist, 400);
+  renderNav();
+}
+
+function go(i) {
+  if (i < 0 || i >= 80) return;
+  S.position = i;
+  persist();
+  renderQuestion();
+}
+
+function toggleFlag() {
+  const i = S.position;
+  S.flags = S.flags.includes(i) ? S.flags.filter(x => x !== i) : [...S.flags, i];
+  persist();
+  renderQuestion();
+}
+
+function clearAnswer() {
+  delete S.answers[BANK[S.set][S.position].id];
+  persist();
+  renderQuestion();
+}
+
+function nextBlank() {
+  const b = BANK[S.set];
+  for (let j = 1; j <= 80; j++) {
+    const i = (S.position + j) % 80;
+    if (!answered(b[i])) { go(i); return; }
+  }
+  alert('모든 문항을 작성하셨습니다.');
+}
+
+function tick() {
+  if (!S || S.submitted) return;
+  const left = Math.max(0, Math.ceil((S.deadline - Date.now()) / 1000));
+  $('timer').textContent = `${String(Math.floor(left / 60)).padStart(2, '0')}:${String(left % 60).padStart(2, '0')}`;
+  if (left === 0) {
+    alert('시험 시간이 종료되었습니다. 자동으로 제출 채점이 진행됩니다.');
+    submitExam(true);
+  }
+}
+
+// 3. 로컬 자동 채점 알고리즘 엔진
+function submitExam(auto) {
+  if (S.submitted) return;
+  const b = BANK[S.set];
+  const missing = 80 - b.filter(answered).length;
+  if (!auto && !confirm(`미응답 문항이 ${missing}개 있습니다. 제출하고 채점하시겠습니까?`)) return;
+
+  S.submitted = true;
+  S.submitted_at = Date.now();
+
+  let exactScore = 0;
+  let essayProvisional = 0;
+  const rows = [];
+  const domainScores = {};
+
+  b.forEach(q => {
+    if (!domainScores[q.domain]) domainScores[q.domain] = { exact: 0, provisional: 0, max: 0 };
+    domainScores[q.domain].max += q.points;
+
+    const userAns = S.answers[q.id];
+    let points = 0;
+    let details = [];
+
+    if (q.type === 'mc') {
+      if (userAns === q.answer) points = q.points;
+      exactScore += points;
+      domainScores[q.domain].exact += points;
+      details.push({ label: "선택지 정답 확인", points: points, max: q.points, expected: `${q.answer + 1}번` });
+    } else if (q.type === 'essay') {
+      const text = String(userAns || '').replace(/\s+/g, '');
+      let detectedCount = 0;
+      const detectedList = [];
+      
+      (q.keywords || []).forEach(kwGroup => {
+        const found = kwGroup.some(kw => text.includes(kw.replace(/\s+/g, '')));
+        if (found) {
+          detectedCount++;
+          detectedList.push(kwGroup[0]);
+        }
+      });
+
+      const maxKw = (q.keywords || []).length || 1;
+      points = Math.round((detectedCount / maxKw) * q.points);
+      essayProvisional += points;
+      domainScores[q.domain].provisional += points;
+      details.push({ label: "키워드 감지 결과", points: points, max: q.points, detected: detectedList, notice: "작성한 문맥에 따라 실제 점수와 차이가 있을 수 있습니다." });
+    } else if (q.type === 'task') {
+      const fieldPoint = q.points / q.fields.length;
+      q.fields.forEach((f, idx) => {
+        const inputVal = String((userAns || {})[idx] || '').trim().toLowerCase();
+        const targetVal = String(f.key).trim().toLowerCase();
+        let fScore = 0;
+        if (inputVal && (inputVal === targetVal || targetVal.includes(inputVal))) {
+          fScore = fieldPoint;
+        }
+        points += fScore;
+        details.push({ label: f.label, points: fScore, max: fieldPoint, answer: (userAns || {})[idx], expected: f.key });
+      });
+      exactScore += points;
+      domainScores[q.domain].exact += points;
+    }
+
+    rows.push({
+      id: q.id,
+      domain: q.domain,
+      type: q.type,
+      points: points,
+      max: q.points,
+      provisional: q.type === 'essay',
+      answer: userAns,
+      correct: q.correct || (q.type === 'mc' ? `${q.answer + 1}번` : '항목별 정답 참조'),
+      explanation: q.explanation,
+      detail: details
+    });
+  });
+
+  S.result = {
+    exact: exactScore,
+    essay_provisional: essayProvisional,
+    total: exactScore + essayProvisional,
+    rows: rows,
+    domains: domainScores
+  };
+
+  persist();
+  showResults();
+}
+
+function showResults() {
+  $('exam').classList.add('hidden');$('lobby').classList.add('hidden');
+  $('timer').classList.add('hidden');$('results').classList.remove('hidden');
+
+  const r = S.result;
+  $('results').innerHTML = `
+    <div class="panel">
+      <div class="eyebrow">SET ${S.set + 1} · SUBMISSION COMPLETED</div>
+      <h1>최종 평가 채점 결과</h1>
+      <p class="small muted">제출 일시: ${new Date(S.submitted_at).toLocaleString()}</p>
+      <h2 class="resulttitle">정답 확정 점수: ${r.exact}점 / 790점</h2>
+      <p><strong>서술형 채점 점수: ${r.essay_provisional}점 / 210점</strong> | 총합 점수: <strong>${r.total}점 / 1,000점</strong></p>
+      
+      <h3>영역별 점수 분석</h3>
+      <table>
+        <thead><tr><th>영역</th><th>확정 점수</th><th>서술 점수</th><th>영역 총 배점</th></tr></thead>
+        <tbody>
+          ${Object.entries(r.domains).map(([k, v]) => `
+            <tr><td>${esc(k)}</td><td>${v.exact}점</td><td>${v.provisional}점</td><td>${v.max}점</td></tr>
+          `).join('')}
+        </tbody>
+      </table>
+
+      <div class="buttons">
+        <button class="primary" onclick="window.print()">결과 리포트 출력 / PDF 저장</button>
+        <button onclick="exportBackup()">응시 답안 내보내기</button>
+        <button onclick="home()">로비로 돌아가기</button>
+      </div>
+
+      <h2 style="margin-top:30px">문항별 상세 해설 및 채점 오답노트</h2>
+      <label><input type="checkbox" id="onlyReview" onchange="filterResults()"> 오답 및 부분점수 문항만 검토하기</label>
+    </div>
+
+    <div id="reviewRows">
+      ${r.rows.map(row => `
+        <details data-review="${row.points < row.max}">
+          <summary>Q${row.id} ·${esc(row.domain)} · 획득 점수: ${row.points} /${row.max}점</summary>
+          <p class="qtext">${esc(BANK[S.set][row.id - 1].prompt)}</p>
+          <h3>작성한 답안</h3>
+          <div class="answer">${esc(formatAnswer(row))}</div>
+          <h3>정답 및 해설</h3>
+          <div class="answer">${esc(row.correct)}\n\n[해설] ${esc(row.explanation)}</div>${row.detail.map(d => `
+            <div class="rubric">
+              <strong>${esc(d.label)}</strong> · ${d.points} / ${d.max}점
+              ${d.expected ? `<br>기준 정답: ${esc(d.expected)}` : ''}
+              ${d.detected ? `<br>감지된 키워드: ${esc(d.detected.join(', ') || '없음')}` : ''}
+            </div>
+          `).join('')}
+        </details>
+      `).join('')}
+    </div>
+  `;
+}
+
+function formatAnswer(row) {
+  const a = row.answer;
+  if (a === undefined || a === null) return '(미응답)';
+  if (row.type === 'mc') return `${a + 1}번 · ${BANK[S.set][row.id - 1].options[a]}`;
+  if (row.type === 'task') return BANK[S.set][row.id - 1].fields.map((f, i) => `${f.label}: ${(a || {})[i] || '(미응답)'}`).join('\n');
+  return a || '(미응답)';
+}
+
+function filterResults() {
+  const only = $('onlyReview').checked;
+  document.querySelectorAll('#reviewRows details').forEach(x => {
+    x.classList.toggle('hidden', only && x.dataset.review !== 'true');
+  });
+}
+
+function exportBackup() {
+  if (!S) return;
+  const a = document.createElement('a');
+  const u = URL.createObjectURL(new Blob([JSON.stringify(S, null, 2)], { type: 'application/json' }));
+  a.href = u;
+  a.download = `TOPCIT_SET${S.set + 1}_backup.json`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(u), 1000);
+}
+
+function importClick() {
+  $('fileInput').click();
+}
+
+$('fileInput').addEventListener('change', async e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  try {
+    const d = JSON.parse(await f.text());
+    if (!d.answers || d.set === undefined) throw new Error('올바른 백업 파일이 아닙니다.');
+    S = d;
+    persist();
+    showExam();
+  } catch(err) {
+    alert(err.message);
+  } finally {
+    e.target.value = '';
+  }
+});
+
+setInterval(tick, 1000);
+renderHistory();
+</script>
+</body>
+</html>
